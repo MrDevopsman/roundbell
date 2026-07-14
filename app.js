@@ -93,6 +93,7 @@ function startPhase(next) {
   remaining = phaseTotal;
   endAt = Date.now() + phaseTotal * 1000;
   warned = false;
+  if (next === "prep") bell(1);   // audible confirmation inside the Start tap
   if (next === "work") bell(1);   // round starts, single bell
   if (next === "rest") bell(3);   // round over, triple bell
   render();
@@ -212,22 +213,17 @@ Object.values(sounds).forEach((a) => a.load());
 let unlocked = false;
 
 function audioReady() {
-  // iOS only lets audio start from a user gesture; play each sound muted
-  // once during the Start tap so later programmatic plays are allowed
+  // iOS only allows programmatic playback on elements that have already
+  // played inside a user gesture. Start each one unmuted and pause it
+  // synchronously; the pause must not be queued behind the play() promise
+  // or it would cut off a real ring that follows in the same gesture.
   if (unlocked) return;
   unlocked = true;
   Object.values(sounds).forEach((a) => {
-    a.muted = true;
     const p = a.play();
-    if (p) {
-      p.then(() => {
-        a.pause();
-        a.currentTime = 0;
-        a.muted = false;
-      }).catch(() => {
-        a.muted = false;
-      });
-    }
+    if (p) p.catch(() => {});
+    a.pause();
+    a.currentTime = 0;
   });
 }
 

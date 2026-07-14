@@ -1,7 +1,7 @@
 /* RoundBell service worker: cache everything, serve cache-first,
    refresh the cache in the background. Bump VERSION on any file change. */
 
-const VERSION = "roundbell-v2";
+const VERSION = "roundbell-v3";
 const ASSETS = [
   ".",
   "index.html",
