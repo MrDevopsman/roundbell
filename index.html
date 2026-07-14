@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Round Bell, boxing timer</title>
+  <meta name="theme-color" content="#14161a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RoundBell">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app" id="app" data-phase="idle">
+
+    <header class="topbar">
+      <div class="brand">🥊 Round<span>Bell</span></div>
+      <button class="sound-toggle" id="soundToggle" title="Toggle sound">🔔 Sound on</button>
+    </header>
+
+    <main class="stage">
+      <div class="phase-label" id="phaseLabel">Ready when you are</div>
+      <div class="round-label" id="roundLabel">&nbsp;</div>
+      <div class="clock" id="clock">3:00</div>
+      <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+      <div class="controls">
+        <button class="big-btn" id="startBtn">Start</button>
+        <button class="ghost" id="skipBtn" disabled>Skip ›</button>
+        <button class="ghost" id="resetBtn" disabled>Reset</button>
+      </div>
+    </main>
+
+    <section class="settings" id="settings">
+      <div class="setting">
+        <span class="setting-name">Rounds</span>
+        <div class="stepper">
+          <button data-key="rounds" data-dir="-1">−</button>
+          <span id="val-rounds">12</span>
+          <button data-key="rounds" data-dir="1">+</button>
+        </div>
+      </div>
+      <div class="setting">
+        <span class="setting-name">Round length</span>
+        <div class="stepper">
+          <button data-key="work" data-dir="-1">−</button>
+          <span id="val-work">3:00</span>
+          <button data-key="work" data-dir="1">+</button>
+        </div>
+      </div>
+      <div class="setting">
+        <span class="setting-name">Rest</span>
+        <div class="stepper">
+          <button data-key="rest" data-dir="-1">−</button>
+          <span id="val-rest">1:00</span>
+          <button data-key="rest" data-dir="1">+</button>
+        </div>
+      </div>
+      <div class="setting">
+        <span class="setting-name">Get ready</span>
+        <div class="stepper">
+          <button data-key="prep" data-dir="-1">−</button>
+          <span id="val-prep">0:10</span>
+          <button data-key="prep" data-dir="1">+</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="hint">Bell at every round start and end, clacks at the final 10 seconds.</footer>
+  </div>
+  <script src="app.js"></script>
+  <script>
+    // offline support when served over HTTPS (or localhost)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>
