@@ -199,62 +199,51 @@ document.querySelectorAll(".stepper button").forEach((btn) => {
   });
 });
 
-/* ---------- sounds (Web Audio, no files) ---------- */
+/* ---------- sounds ----------
+   WAV files played through <audio> elements, not Web Audio: on iOS,
+   media playback ignores the silent switch, Web Audio does not. */
 
-let ctx = null;
+const sounds = {
+  bell1: new Audio("bell1.wav"),
+  bell3: new Audio("bell3.wav"),
+  clack: new Audio("clack.wav"),
+};
+Object.values(sounds).forEach((a) => a.load());
+let unlocked = false;
 
 function audioReady() {
-  if (!ctx) {
-    try {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch {
-      ctx = null;
+  // iOS only lets audio start from a user gesture; play each sound muted
+  // once during the Start tap so later programmatic plays are allowed
+  if (unlocked) return;
+  unlocked = true;
+  Object.values(sounds).forEach((a) => {
+    a.muted = true;
+    const p = a.play();
+    if (p) {
+      p.then(() => {
+        a.pause();
+        a.currentTime = 0;
+        a.muted = false;
+      }).catch(() => {
+        a.muted = false;
+      });
     }
-  }
-  if (ctx && ctx.state === "suspended") ctx.resume();
-}
-
-function ring(t0, dur = 0.9) {
-  // a bell is a burst of slightly detuned partials with a fast decay
-  [520, 780, 1240, 1560].forEach((f, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.value = f * (1 + (Math.random() - 0.5) * 0.01);
-    gain.gain.setValueAtTime(0.25 / (i + 1), t0);
-    gain.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t0);
-    osc.stop(t0 + dur);
   });
 }
 
-function bell(times) {
+function play(name) {
   if (!cfg.sound) return;
-  audioReady();
-  if (!ctx) return;
-  const now = ctx.currentTime;
-  for (let i = 0; i < times; i++) ring(now + i * 0.35);
+  const a = sounds[name];
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
+
+function bell(times) {
+  play(times >= 3 ? "bell3" : "bell1");
 }
 
 function clacks() {
-  // wooden clacker warning: three short high clicks
-  if (!cfg.sound) return;
-  audioReady();
-  if (!ctx) return;
-  const now = ctx.currentTime;
-  for (let i = 0; i < 3; i++) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "square";
-    osc.frequency.value = 2200;
-    const t = now + i * 0.18;
-    gain.gain.setValueAtTime(0.15, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.07);
-  }
+  play("clack");
 }
 
 /* ---------- keep the screen awake during a session ---------- */

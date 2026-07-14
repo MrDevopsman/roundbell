@@ -1,7 +1,7 @@
 /* RoundBell service worker: cache everything, serve cache-first,
    refresh the cache in the background. Bump VERSION on any file change. */
 
-const VERSION = "roundbell-v1";
+const VERSION = "roundbell-v2";
 const ASSETS = [
   ".",
   "index.html",
@@ -11,6 +11,9 @@ const ASSETS = [
   "icon-192.png",
   "icon-512.png",
   "apple-touch-icon.png",
+  "bell1.wav",
+  "bell3.wav",
+  "clack.wav",
 ];
 
 self.addEventListener("install", (e) => {
